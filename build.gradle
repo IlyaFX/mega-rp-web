@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+}
+
+group 'ru.atlant'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+compileJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "ru.atlant.roleplay.WebService"
+    }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+dependencies {
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    compile group: 'com.zaxxer', name: 'HikariCP', version: '3.4.5'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.20'
+    compile "org.thymeleaf:thymeleaf:3.0.9.RELEASE"
+    compile "org.slf4j:slf4j-simple:1.7.28"
+    compile 'io.javalin:javalin:3.7.0'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.10.1'
+}

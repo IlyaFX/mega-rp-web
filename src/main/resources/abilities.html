@@ -1,0 +1,43 @@
+<html>
+<head>
+    <title>Atlant Abilities</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<th:block th:each="entry : ${header}">
+    <a th:href="${entry.value}">
+        <button><h2 th:text="${entry.key}"></h2></button>
+    </a>
+</th:block>
+<h1>Abilities</h1>
+<a href="/replaceability">
+    <button><h2>New ability</h2></button>
+</a>
+<table border="1">
+    <caption>Abilities</caption>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Perms</th>
+        <th>Change</th>
+        <th>Delete</th>
+    </tr>
+    <tr th:each="item: ${abilities}">
+        <td th:text="${item.id}"></td>
+        <td th:text="${item.name}"></td>
+        <td>
+            <th:block th:each="perm : ${item.permissions}">
+                <p th:text="${perm}"></p>
+                <br/>
+            </th:block>
+        </td>
+        <td><a th:href="'replaceability?id=' + ${item.id}">
+            <button>Change</button>
+        </a></td>
+        <td><a th:href="'deleteability?id=' + ${item.id}">
+            <button>Delete</button>
+        </a></td>
+    </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<html>
+<head>
+    <title>Change config value</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <form action="replaceconfigimpl" method="post">
+        <input type="text" name="key" placeholder="Key" th:value="${key}">
+        <br />
+        <input type="text" name="value" placeholder="Value" th:value="${value}">
+        <br />
+        <input type="submit" value="Change">
+    </form>
+</body>
+</html>

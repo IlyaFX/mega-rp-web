@@ -1,0 +1,12 @@
+<html>
+<head>
+    <title>Atlant web</title>
+</head>
+<body>
+<th:block th:each="entry : ${header}">
+    <a th:href="${entry.value}">
+        <button><h2 th:text="${entry.key}"></h2></button>
+    </a>
+</th:block>
+</body>
+</html>

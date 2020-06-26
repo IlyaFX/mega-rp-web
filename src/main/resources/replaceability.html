@@ -1,0 +1,38 @@
+<html>
+<head>
+    <title>Change ability</title>
+    <meta charset="UTF-8">
+    <script type="application/javascript">
+        let id = 1;
+
+        function newField() {
+            let form = document.getElementById("change");
+            let keyElement = document.createElement("input");
+            keyElement.type = "text";
+            keyElement.name = "perm" + id;
+            keyElement.placeholder = "Permission field " + id;
+            form.appendChild(keyElement);
+            form.appendChild(document.createElement("br"));
+            id++;
+        }
+    </script>
+
+</head>
+<body>
+<form action="replaceabilityimpl" method="post" id="change">
+    <input type="text" name="id" th:value="${id}" placeholder="ID">
+    <br/>
+    <input type="text" name="name" th:value="${name}" placeholder="Name">
+    <br/>
+    <button type="button" onclick="newField()">New permission field</button>
+    <br/>
+    <input type="submit" value="Change">
+    <br />
+    <th:block th:each="item, index: ${perms}">
+        <input type="text" th:name="'perm_static_' + ${index}" th:value="${item}"
+               th:placeholder="'Permission static id ' + ${index}">
+        <br/>
+    </th:block>
+</form>
+</body>
+</html>

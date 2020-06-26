@@ -1,0 +1,57 @@
+<html>
+<head>
+    <title>Fractions</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<th:block th:each="entry : ${header}">
+    <a th:href="${entry.value}">
+        <button><h2 th:text="${entry.key}"></h2></button>
+    </a>
+</th:block>
+<h1>Fractions</h1>
+<a href="/replacefraction">
+    <button><h2>New Fraction</h2></button>
+</a>
+<th:block th:each="frac : ${fractions}">
+    <hr/>
+    <h1 th:text="${frac.name} + ' (' + ${frac.id} + ') Jobs'"></h1>
+    <a th:href="'/replacefraction?id=' + ${frac.id}">
+        <button><h2>Change id or name</h2></button>
+    </a>
+    <br/>
+    <a th:href="'/replacejob?frac=' + ${frac.id}">
+        <button><h2>New job</h2></button>
+    </a>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Abilities</th>
+            <th>Change</th>
+            <th>Delete</th>
+        </tr>
+        <tr th:each="job : ${frac.jobs}">
+            <td th:text="${job.id}"></td>
+            <td th:text="${job.name}"></td>
+            <td>
+                <th:block th:each="ability : ${job.abilities}">
+                    <p th:text="${ability}"></p>
+                    <br/>
+                </th:block>
+            </td>
+            <td><a th:href="'replacejob?id=' + ${job.id} + '&frac=' + ${frac.id}">
+                <button>Change</button>
+            </a></td>
+            <td><a th:href="'deletejob?id=' + ${job.id} + '&frac=' + ${frac.id}">
+                <button>Delete</button>
+            </a></td>
+        </tr>
+    </table>
+    <a th:href="'deletefrac?id=' + ${frac.id}">
+        <button>Delete fraction</button>
+    </a>
+    <hr/>
+</th:block>
+</body>
+</html>

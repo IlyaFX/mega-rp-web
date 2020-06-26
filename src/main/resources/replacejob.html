@@ -1,0 +1,23 @@
+<html>
+<head>
+    <title>Change job</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<form action="replacejobimpl" method="post">
+    <input type="text" name="fraction" th:value="${fraction}" placeholder="Fraction">
+    <br/>
+    <input type="text" name="id" th:value="${job}" placeholder="Job id">
+    <br/>
+    <input type="text" name="name" th:value="${name}" placeholder="Job name">
+    <br/>
+    <th:block th:each="entry : ${abilities}">
+        <input type="checkbox" th:name="${entry.key.id}" th:value="${entry.key.id}" th:checked="${entry.value}">
+        <th:block th:text="${entry.key.name}"></th:block>
+        <br/>
+    </th:block>
+    <br/>
+    <input type="submit" value="Change">
+</form>
+</body>
+</html>
