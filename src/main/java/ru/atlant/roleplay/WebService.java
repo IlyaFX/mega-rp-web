@@ -7,6 +7,7 @@ import ru.atlant.roleplay.data.DataManager;
 import ru.atlant.roleplay.data.impl.MySQLDataManager;
 import ru.atlant.roleplay.data.impl.TestDataManager;
 import ru.atlant.roleplay.data.type.Ability;
+import ru.atlant.roleplay.data.type.Board;
 import ru.atlant.roleplay.data.type.Fraction;
 import ru.atlant.roleplay.data.type.Job;
 
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class WebService {
 
@@ -37,10 +39,11 @@ public class WebService {
             }
             dataManager = new MySQLDataManager(dataInfo[0], Integer.parseInt(dataInfo[1]), dataInfo[2], dataInfo[3], dataInfo[4]);
         }
-        Map<String, String> header = new HashMap<>(3);
+        Map<String, String> header = new HashMap<>(4);
         header.put("Config", "/config");
         header.put("Abilities", "/abilities");
         header.put("Fractions", "/fractions");
+        header.put("Boards", "/boards");
         Javalin
                 .create()
                 .get("/abilities", ctx -> {
@@ -164,6 +167,37 @@ public class WebService {
                 .get("/fetchdata", ctx -> {
                     ctx.json(compileData(dataManager));
                 })
+                .get("/boards", ctx -> {
+                    Map<String, Object> model = new HashMap<>();
+                    model.put("boards", dataManager.getBoards().stream().map(board -> {
+                        return new Board(board.getId(), board.getTitle(), board.getLines().stream().map(s -> {
+                            if (s.trim().isEmpty())
+                                return "___";
+                            return s;
+                        }).collect(Collectors.toList()));
+                    }).collect(Collectors.toList()));
+                    model.put("header", header);
+                    ctx.render("/boards.html", model);
+                })
+                .get("/replaceboard", ctx -> {
+                    Map<String, Object> model = new HashMap<>();
+                    String id = ctx.queryParam("id");
+                    Board board = dataManager.getBoard(id);
+                    if (board != null) {
+                        model.put("id", id);
+                        model.put("title", board.getTitle());
+                        model.put("lines", String.join("\n", board.getLines()));
+                    } else model.put("lines", "  \nPlayer is %player%\n  ");
+                    ctx.render("/replaceboard.html", model);
+                })
+                .post("/replaceboardimpl", ctx -> {
+                    dataManager.replaceBoard(ctx.formParam("id"), ctx.formParam("title"), Stream.of(ctx.formParam("lines").split("\n")).collect(Collectors.toList()));
+                    ctx.redirect("/boards");
+                })
+                .get("/deleteboard", ctx -> {
+                    dataManager.removeBoard(ctx.queryParam("id"));
+                    ctx.redirect("/boards");
+                })
                 .start(Integer.parseInt(System.getenv("PORT")));
     }
 
@@ -171,7 +205,9 @@ public class WebService {
         List<RolePlayData.AbilityData> abilityData = dataManager.getAbilities().stream().map(ability -> new RolePlayData.AbilityData(ability.getId(), ability.getName(), ability.getPermissions())).collect(Collectors.toList());
         List<RolePlayData.FractionData> fractionData = dataManager.getFractions().stream().map(fraction ->
                 new RolePlayData.FractionData(fraction.getId(), fraction.getName(), fraction.getJobs().stream().map(job -> new RolePlayData.JobData(job.getId(), job.getName(), job.getAbilities())).collect(Collectors.toList()))).collect(Collectors.toList());
-        return new RolePlayData(abilityData, fractionData, dataManager.getConfig());
+        List<RolePlayData.BoardData> boardData = dataManager.getBoards().stream().map(board ->
+                new RolePlayData.BoardData(board.getId(), board.getTitle(), board.getLines())).collect(Collectors.toList());
+        return new RolePlayData(abilityData, fractionData, boardData, dataManager.getConfig());
     }
 
     @AllArgsConstructor
@@ -179,7 +215,18 @@ public class WebService {
     public static class RolePlayData {
         private List<AbilityData> abilities;
         private List<FractionData> fractionData;
+        private List<BoardData> boards;
         private Map<String, String> config;
+
+        @AllArgsConstructor
+        @Getter
+        public static class BoardData {
+
+            private final String id;
+            private final String title;
+            private final List<String> lines;
+
+        }
 
         @AllArgsConstructor
         @Getter

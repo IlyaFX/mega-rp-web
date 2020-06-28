@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import ru.atlant.roleplay.data.DataManager;
 import ru.atlant.roleplay.data.impl.sql.factories.SyncQueryFactory;
 import ru.atlant.roleplay.data.type.Ability;
+import ru.atlant.roleplay.data.type.Board;
 import ru.atlant.roleplay.data.type.Fraction;
 import ru.atlant.roleplay.data.type.Job;
 
@@ -18,6 +19,7 @@ public class MySQLDataManager implements DataManager {
     private static final String CREATE_ABILITIES_TABLE_QUERY = "CREATE TABLE IF NOT EXISTS `abilities` (`id` varchar(50) NOT NULL, `name` varchar(50) NOT NULL, `permissions` TEXT NOT NULL, PRIMARY KEY(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
     private static final String CREATE_FRACTIONS_TABLE_QUERY = "CREATE TABLE IF NOT EXISTS `fractions` (`id` varchar(50) NOT NULL, `name` varchar(50) NOT NULL, PRIMARY KEY(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
     private static final String CREATE_JOBS_TABLE_QUERY = "CREATE TABLE IF NOT EXISTS `jobs` (`fraction` varchar(50) NOT NULL, `id` varchar(50) NOT NULL, `name` varchar(50) NOT NULL, `abilities` TEXT NOT NULL, PRIMARY KEY(`fraction`,`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+    private static final String CREATE_BOARDS_TABLE_QUERY = "CREATE TABLE IF NOT EXISTS `boards` (`id` varchar(50) NOT NULL, `title` varchar(50) NOT NULL, `lines` TEXT NOT NULL, PRIMARY KEY(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
     private SyncQueryFactory sync;
 
@@ -37,6 +39,7 @@ public class MySQLDataManager implements DataManager {
         sync.unsafeUpdate(CREATE_ABILITIES_TABLE_QUERY);
         sync.unsafeUpdate(CREATE_FRACTIONS_TABLE_QUERY);
         sync.unsafeUpdate(CREATE_JOBS_TABLE_QUERY);
+        sync.unsafeUpdate(CREATE_BOARDS_TABLE_QUERY);
     }
 
     @Override
@@ -199,6 +202,46 @@ public class MySQLDataManager implements DataManager {
     @Override
     public void removeAbility(String id) {
         sync.prepareUpdate("DELETE FROM `abilities` WHERE `id` = ?", ps -> {
+            try {
+                ps.setString(1, id);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+    }
+
+    @Override
+    public List<Board> getBoards() {
+        return sync.unsafeGet("SELECT * FROM `boards`").all().stream().map(Board::fromSection).collect(Collectors.toList());
+    }
+
+    @Override
+    public Board getBoard(String id) {
+        return sync.prepareGet("SELECT * FROM `boards` WHERE `id` = ?", ps -> {
+            try {
+                ps.setString(1, id);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }).all().stream().findFirst().map(Board::fromSection).orElse(null);
+    }
+
+    @Override
+    public void replaceBoard(String id, String title, List<String> lines) {
+        sync.prepareUpdate("REPLACE INTO `boards` VALUES (?,?,?)", ps -> {
+            try {
+                ps.setString(1, id);
+                ps.setString(2, title);
+                ps.setString(3, String.join(";;;", lines));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+    }
+
+    @Override
+    public void removeBoard(String id) {
+        sync.prepareUpdate("DELETE FROM `boards` WHERE `id` = ?", ps -> {
             try {
                 ps.setString(1, id);
             } catch (Exception ex) {

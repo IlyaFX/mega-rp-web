@@ -3,6 +3,7 @@ package ru.atlant.roleplay.data.impl;
 import lombok.Getter;
 import ru.atlant.roleplay.data.DataManager;
 import ru.atlant.roleplay.data.type.Ability;
+import ru.atlant.roleplay.data.type.Board;
 import ru.atlant.roleplay.data.type.Fraction;
 import ru.atlant.roleplay.data.type.Job;
 
@@ -13,6 +14,7 @@ public class TestDataManager implements DataManager {
 
     private List<Ability> abilities = new ArrayList<>();
     private List<Fraction> fractions = new ArrayList<>();
+    private List<Board> boards = new ArrayList<>();
     private Map<String, String> config = new HashMap<>();
 
     public TestDataManager() {
@@ -21,6 +23,7 @@ public class TestDataManager implements DataManager {
         fraction.getJobs().add(new Job("testjob", "Тестовая работа", new ArrayList<>(Collections.singletonList(abilities.get(0).getId()))));
         fractions.add(fraction);
         config.put("time", "120");
+        boards.add(new Board("game", "RolePlay", Arrays.asList("Player %player%", "Time %time%", "Role %role%")));
     }
 
     @Override
@@ -87,5 +90,22 @@ public class TestDataManager implements DataManager {
     @Override
     public String getValue(String key) {
         return config.get(key);
+    }
+
+    @Override
+    public void removeBoard(String id) {
+        boards.removeIf(board -> board.getId().equals(id));
+    }
+
+    @Override
+    public void replaceBoard(String id, String title, List<String> lines) {
+        Board board = new Board(id, title, lines);
+        removeBoard(id);
+        boards.add(board);
+    }
+
+    @Override
+    public Board getBoard(String id) {
+        return boards.stream().filter(board -> board.getId().equals(id)).findFirst().orElse(null);
     }
 }

@@ -1,0 +1,16 @@
+<html>
+<head>
+    <title>Change board</title>
+</head>
+<body>
+<form action="replaceboardimpl" method="post">
+    <input type="text" name="id" th:value="${id}" placeholder="ID">
+    <br/>
+    <input type="text" name="title" th:value="${title}" placeholder="Title">
+    <br/>
+    <textarea name="lines" rows="50" cols="150" th:text="${lines}"></textarea>
+    <br/>
+    <input type="submit" value="Change">
+</form>
+</body>
+</html>

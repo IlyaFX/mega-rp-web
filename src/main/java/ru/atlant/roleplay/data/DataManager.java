@@ -1,6 +1,7 @@
 package ru.atlant.roleplay.data;
 
 import ru.atlant.roleplay.data.type.Ability;
+import ru.atlant.roleplay.data.type.Board;
 import ru.atlant.roleplay.data.type.Fraction;
 
 import java.util.List;
@@ -35,5 +36,13 @@ public interface DataManager {
     void replaceConfig(String key, String value);
 
     void removeConfig(String key);
+
+    List<Board> getBoards();
+
+    Board getBoard(String id);
+
+    void replaceBoard(String id, String title, List<String> lines);
+
+    void removeBoard(String id);
 
 }

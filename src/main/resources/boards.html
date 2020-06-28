@@ -1,0 +1,33 @@
+<html>
+<head>
+    <title>Scoreboards</title>
+</head>
+<body>
+<th:block th:each="entry : ${header}">
+    <a th:href="${entry.value}">
+        <button><h2 th:text="${entry.key}"></h2></button>
+    </a>
+</th:block>
+<h1>Scoreboards</h1>
+<a href="/replaceboard">
+    <button><h2>New Board</h2></button>
+</a>
+<th:block th:each="board : ${boards}">
+    <hr/>
+    <h1 th:text="${board.title}"></h1>
+    <h3 th:text="${board.id}"></h3>
+    <table border="1">
+        <tr th:each="line : ${board.lines}">
+            <td th:text="${line}"></td>
+        </tr>
+    </table>
+    <a th:href="'/replaceboard?id=' + ${board.id}">
+        <button><h2>Change board</h2></button>
+    </a>
+    <a th:href="'/deleteboard?id=' + ${board.id}">
+        <button>Delete board</button>
+    </a>
+    <hr/>
+</th:block>
+</body>
+</html>
